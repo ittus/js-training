@@ -5,15 +5,20 @@
     </div>
     <nav>
       <ul>
-        <li>
+        <li v-if="!auth">
           <router-link to="/signup">Sign Up</router-link>
         </li>
-        <li>
+        <li v-if="!auth">
           <router-link to="/signin">Sign In</router-link>
         </li>
-        <li>
-          <router-link to="/dashboard">Dashboard</router-link>
+        <li v-if="auth">
+          <router-link to="/dashboard">
+            Dashboard
+          </router-link>
         </li>
+        <button class="logout" @click="onLogout" v-if="auth">
+          Logout
+        </button>
       </ul>
     </nav>
   </header>
@@ -68,4 +73,26 @@
   li a.router-link-active {
     color: #fa923f;
   }
+  .logout {
+    background-color: transparent;
+    color: white;
+    border: none;
+    font: inherit;
+    cursor: pointer;
+  }
 </style>
+
+<script>
+  export default {
+    computed: {
+      auth () {
+        return this.$store.getters.isAuthenticated
+      }
+    },
+    methods: {
+      onLogout() {
+        this.$store.dispatch('logout')
+      }
+    }
+  }
+</script>
