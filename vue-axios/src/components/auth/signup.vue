@@ -22,18 +22,20 @@
             <p v-if="!$v.age.minVal">You have to be at least {{ $v.age.$params.minVal.min }} age.</p>
             <p v-if="!$v.age.required">This field must not be empty.</p>
         </div>
-        <div class="input">
+        <div class="input" :class="{invalid: $v.password.$error}">
           <label for="password">Password</label>
           <input
                   type="password"
                   id="password"
+                  @blur="$v.password.$touch()"
                   v-model="password">
         </div>
-        <div class="input">
+        <div class="input" :class="{invalid: $v.confirmPassword.$error}">
           <label for="confirm-password">Confirm Password</label>
           <input
                   type="password"
                   id="confirm-password"
+                  @blur="$v.confirmPassword.$touch()"
                   v-model="confirmPassword">
         </div>
         <div class="input">
@@ -51,23 +53,30 @@
           <div class="hobby-list">
             <div
                     class="input"
+                    :class="{invalid: $v.hobbyInputs.$each[index].$error}"
                     v-for="(hobbyInput, index) in hobbyInputs"
                     :key="hobbyInput.id">
               <label :for="hobbyInput.id">Hobby #{{ index }}</label>
               <input
                       type="text"
                       :id="hobbyInput.id"
+                      @blur="$v.hobbyInputs.$each[index].value.$touch()"
                       v-model="hobbyInput.value">
               <button @click="onDeleteHobby(hobbyInput.id)" type="button">X</button>
             </div>
+            <p v-if="!$v.hobbyInputs.minLen">You have to specify at least {{ $v.hobbyInputs.$params.minLen.min }} hobbies</p>
+            <p v-if="!$v.hobbyInputs.required">Please add a hobby</p>
           </div>
         </div>
-        <div class="input inline">
-          <input type="checkbox" id="terms" v-model="terms">
+        <div class="input inline" :class="{invalid: $v.terms.$invalid}">
+          <input type="checkbox"
+                 id="terms"
+                 v-model="terms"
+                 @change="$v.terms.$touch()">
           <label for="terms">Accept Terms of Use</label>
         </div>
         <div class="submit">
-          <button type="submit">Submit</button>
+          <button type="submit" :disabled="$v.$invalid">Submit</button>
         </div>
       </form>
     </div>
@@ -75,7 +84,7 @@
 </template>
 
 <script>
-  import { required, email, numeric, minValue } from 'vuelidate/lib/validators'
+  import { required, email, numeric, minValue, minLength, sameAs, requiredUnless } from 'vuelidate/lib/validators'
   export default {
     data () {
       return {
@@ -97,6 +106,36 @@
         required,
         numeric,
         minVal: minValue(18)
+      },
+      password: {
+        required,
+        minLen: minLength(6)
+      },
+      confirmPassword: {
+        // sameAs: sameAs('password')
+        sameAs: sameAs(vm => {
+          return vm.password
+        })
+      },
+      terms: {
+        checked (val) {
+          console.log(this)
+          console.log(this.country)
+          if (this.country === 'germany')  {
+            return true
+          }
+          return val
+        }
+      },
+      hobbyInputs: {
+        required,
+        minLen: minLength(2),
+        $each: {
+          value: {
+            required,
+            minLen: minLength(5)
+          }
+        }
       }
     },
     methods: {
