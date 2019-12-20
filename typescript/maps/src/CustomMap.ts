@@ -1,3 +1,10 @@
+export interface Mappable {
+  location: {
+    lat: number
+    lng: number
+  }
+}
+
 export class CustomMap {
   private googleMap: google.maps.Map
 
@@ -8,6 +15,13 @@ export class CustomMap {
         lat: 0,
         lng: 0
       }
+    })
+  }
+
+  addMarker(user: Mappable): void {
+    new google.maps.Marker({
+      map: this.googleMap,
+      position: user.location
     })
   }
 }
