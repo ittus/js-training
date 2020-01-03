@@ -13,8 +13,12 @@ class Tooltip extends HTMLElement {
           z-index: 10;
         }
 
-        :host {
-          background: lightgrey;
+        :host(.important) {
+          background: var(--color-primary, #ccc);
+        }
+
+        :host-context(p) {
+          font-weight: bold;
         }
 
         .highlight {
