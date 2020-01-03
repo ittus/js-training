@@ -9,12 +9,23 @@
     div {
       border: 2px solid orange;
     }
+
+    .highlight {
+      /* background-color: rgb(240, 214, 167); */
+      /* border-bottom: 2px solid blue; */
+    }
+
+    uc-tooltip {
+      border: 1px solid blue;
+      padding: 0.15rem;
+    }
   </style>
   <script src="tooltip.js"></script>
   <script src="confirm-link.js"></script>
 </head>
 <body>
-  <p><uc-tooltip text="Web Component is a set of standards.">Web components</uc-tooltip> are awesome!</p>
+  <p><uc-tooltip text="Web Component is a set of standards.">
+    <span class="highlight">Web components</span></uc-tooltip> are awesome!</p>
   <a href="https://www.google.com" is="uc-confirm-link">Google</a>
 </body>
 </html>
