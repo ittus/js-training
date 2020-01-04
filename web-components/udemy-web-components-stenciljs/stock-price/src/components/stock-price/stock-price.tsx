@@ -15,6 +15,8 @@ export class StockPrice {
   @State() stockUserInput: string
   @State() stockInputValid = false
   @State() error: string
+  @State() loading: boolean = false
+
 
   @Prop({ mutable: true, reflect: true }) stockSymbol: string
 
@@ -81,6 +83,7 @@ export class StockPrice {
 
 
   fetchStockPrice(stockSymbol: string) {
+    this.loading = true
     fetch(`https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=${stockSymbol}&apikey=${AV_API_KEY}`)
       .then(res => {
         return res.json()
@@ -92,10 +95,12 @@ export class StockPrice {
         }
         this.fetchedPrice = +parsedRes['Global Quote']['05. price']
         this.error = null
+        this.loading = false
       })
       .catch( err => {
         this.error = err.message
         this.fetchedPrice = null
+        this.loading = false
       })
   }
 
@@ -114,6 +119,10 @@ export class StockPrice {
       dataContent = <p>Price: ${this.fetchedPrice}</p>
     }
 
+    if (this.loading) {
+      dataContent = <uc-spinner></uc-spinner>
+    }
+
     return [
       <form onSubmit={this.onFetchStockPrice.bind(this)}>
         <input
@@ -123,7 +132,7 @@ export class StockPrice {
           value={this.stockUserInput}
           onInput={this.onUserInput.bind(this)}
         />
-        <button type="submit" disabled={!this.stockInputValid}>Fetch</button>
+        <button type="submit" disabled={!this.stockInputValid || this.loading}>Fetch</button>
       </form>,
       <div>
         {dataContent}
