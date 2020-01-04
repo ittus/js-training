@@ -41,9 +41,9 @@
     const sideDrawer = document.querySelector('uc-side-drawer')
 
     sideDrawerButton.addEventListener('click', () => {
-      if (!sideDrawer.open) {
+      if (!sideDrawer.opened) {
         console.log('Openning side bar')
-        sideDrawer.open = true
+        sideDrawer.open()
         // sideDrawer.setAttribute("open", "");
       }
     })
