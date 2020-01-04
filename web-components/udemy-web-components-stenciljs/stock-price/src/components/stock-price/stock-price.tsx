@@ -1,4 +1,4 @@
-import { Component, h, State, Element } from '@stencil/core';
+import { Component, h, State, Element, Prop } from '@stencil/core';
 import { AV_API_KEY } from '../../global/global'
 @Component({
   tag: 'uc-stock-price',
@@ -7,28 +7,22 @@ import { AV_API_KEY } from '../../global/global'
 })
 export class StockPrice {
   stockInput: HTMLInputElement
+  initialStockSymbol: string
 
   @Element() el: HTMLElement
 
   @State() fetchedPrice: number
   @State() stockUserInput: string
   @State() stockInputValid = false
+  @State() error: string
+
+  @Prop() stockSymbol: string
 
   onFetchStockPrice(event: Event) {
     event.preventDefault()
 
-    // const stockSymbol = this.stockInput.value
-    fetch(`https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=${this.stockUserInput}&apikey=${AV_API_KEY}`)
-      .then(res => {
-        return res.json()
-      })
-      .then(parsedRes => {
-        console.log(parsedRes)
-        this.fetchedPrice = +parsedRes['Global Quote']['05. price']
-      })
-      .catch( err => {
-        console.log(err)
-      })
+    const stockSymbol = this.stockInput.value
+    this.fetchStockPrice(stockSymbol)
   }
 
   onUserInput(event: Event) {
@@ -39,7 +33,64 @@ export class StockPrice {
       this.stockInputValid = false
     }
   }
+
+  componentWillLoad() {
+    console.log('componentWillLoad')
+    console.log(this.stockSymbol)
+  }
+
+  componentDidLoad() {
+    if (this.stockSymbol) {
+      this.initialStockSymbol = this.stockSymbol
+      this.stockUserInput = this.stockSymbol
+      this.stockInputValid = true
+      this.fetchStockPrice(this.stockSymbol)
+    }
+  }
+
+  componentWillUpdate() {
+    console.log('componentWillUpdate')
+  }
+
+  componentDidUpdate() {
+    console.log('componentDidUpdate')
+    if (this.stockSymbol !== this.initialStockSymbol) {
+      this.fetchStockPrice(this.stockSymbol)
+      this.initialStockSymbol = this.stockSymbol
+    }
+  }
+
+  componentDidUnload() {
+    console.log('componentDidUnload')
+  }
+
+
+  fetchStockPrice(stockSymbol: string) {
+    fetch(`https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=${stockSymbol}&apikey=${AV_API_KEY}`)
+      .then(res => {
+        return res.json()
+      })
+      .then(parsedRes => {
+        console.log(parsedRes)
+        if (!parsedRes['Global Quote'] || !parsedRes['Global Quote']['05. price']) {
+          throw new Error('Invalid Symbol')
+        }
+        this.fetchedPrice = +parsedRes['Global Quote']['05. price']
+        this.error = null
+      })
+      .catch( err => {
+        this.error = err.message
+      })
+  }
   render() {
+    let dataContent = <p>Please enter a symbol</p>
+    if (this.error) {
+      dataContent = <p>{this.error}</p>
+    }
+    if (this.fetchedPrice) {
+      dataContent = <p>Price: ${this.fetchedPrice}</p>
+    }
+
     return [
       <form onSubmit={this.onFetchStockPrice.bind(this)}>
         <input
@@ -52,7 +103,7 @@ export class StockPrice {
         <button type="submit" disabled={!this.stockInputValid}>Fetch</button>
       </form>,
       <div>
-        <p>Price: ${this.fetchedPrice}</p>
+        {dataContent}
       </div>
     ]
   }
