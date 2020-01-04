@@ -11,6 +11,7 @@ import { HTMLStencilElement, JSXBase } from '@stencil/core/internal';
 
 export namespace Components {
   interface UcSideDrawer {
+    'open': boolean;
     'title': string;
   }
 }
@@ -30,6 +31,7 @@ declare global {
 
 declare namespace LocalJSX {
   interface UcSideDrawer {
+    'open'?: boolean;
     'title'?: string;
   }
 
