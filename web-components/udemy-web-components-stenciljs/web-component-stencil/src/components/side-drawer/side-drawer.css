@@ -1,0 +1,21 @@
+aside {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 30rem;
+  max-width: 80%;
+  height: 100vh;
+  background: #f3f3f3;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.26);
+}
+
+header {
+  padding: 1rem;
+  background: black;
+}
+
+header h1 {
+  font-size: 1.5rem;
+  color: white;
+  margin: 0;
+}
