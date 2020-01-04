@@ -95,8 +95,16 @@ export class StockPrice {
       })
       .catch( err => {
         this.error = err.message
+        this.fetchedPrice = null
       })
   }
+
+  hostData() {
+    return {
+      class: this.error ? 'hydrated error' : ''
+    }
+  }
+
   render() {
     let dataContent = <p>Please enter a symbol</p>
     if (this.error) {
