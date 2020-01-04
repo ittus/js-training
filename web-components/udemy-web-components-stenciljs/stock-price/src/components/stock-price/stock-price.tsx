@@ -11,12 +11,14 @@ export class StockPrice {
   @Element() el: HTMLElement
 
   @State() fetchedPrice: number
+  @State() stockUserInput: string
+  @State() stockInputValid = false
 
   onFetchStockPrice(event: Event) {
     event.preventDefault()
 
-    const stockSymbol = this.stockInput.value
-    fetch(`https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=${stockSymbol}&apikey=${AV_API_KEY}`)
+    // const stockSymbol = this.stockInput.value
+    fetch(`https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=${this.stockUserInput}&apikey=${AV_API_KEY}`)
       .then(res => {
         return res.json()
       })
@@ -28,11 +30,26 @@ export class StockPrice {
         console.log(err)
       })
   }
+
+  onUserInput(event: Event) {
+    this.stockUserInput = (event.target as HTMLInputElement).value
+    if (this.stockUserInput.trim() !== '') {
+      this.stockInputValid = true
+    } else {
+      this.stockInputValid = false
+    }
+  }
   render() {
     return [
       <form onSubmit={this.onFetchStockPrice.bind(this)}>
-        <input type="text" id="stock-symbol" ref={el => this.stockInput = el}/>
-        <button type="submit">Fetch</button>
+        <input
+          type="text"
+          id="stock-symbol"
+          ref={el => this.stockInput = el}
+          value={this.stockUserInput}
+          onInput={this.onUserInput.bind(this)}
+        />
+        <button type="submit" disabled={!this.stockInputValid}>Fetch</button>
       </form>,
       <div>
         <p>Price: ${this.fetchedPrice}</p>
